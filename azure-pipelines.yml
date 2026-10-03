@@ -10,7 +10,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: 'tpcsapproject/MyApp/MyApp.sln'
+  solution: 'WebApp.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
