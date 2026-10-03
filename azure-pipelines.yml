@@ -10,7 +10,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: 'WebApp.sln'
+  solution: 'webApp.slnx'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
