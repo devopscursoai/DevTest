@@ -1,52 +1,32 @@
 trigger:
 - main
 
-resources:
-  repositories:
-    - repository: GitHubRepo
-      type: github
-      name: devopscursoai/DevTest
-      endpoint: GitHubConnection
-      ref: main
-
 pool:
   vmImage: 'windows-latest'
 
-variables:
-  solution: 'webApp.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-
 steps:
-- checkout: GitHubRepo
-  clean: true
-
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
+- task: UseDotNet@2
   inputs:
-    restoreSolution: '$(solution)'
+    packageType: 'sdk'
+    version: '8.0.x'
+  displayName: 'Install .NET SDK'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+- script: |
+    dotnet restore
+    dotnet build --configuration Release
+    dotnet publish --configuration Release --output $(Build.ArtifactStagingDirectory)
+  displayName: 'Build and Publish ASP.NET App'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(build.artifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
-    publishLocation: 'Container'
 
 - task: AzureWebApp@1
-  displayName: 'Deploy to Azure Web App'
   inputs:
     azureSubscription: 'Azure Connection'
     appName: 'tpcsapp'
-    resourceGroupName: 'DevopsRG1'
-    package: '$(build.artifactStagingDirectory)/**/*.zip'
+    package: '$(Build.ArtifactStagingDirectory)'
 
 
 
