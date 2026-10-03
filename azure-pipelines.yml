@@ -1,6 +1,14 @@
 trigger:
 - main
 
+resources:
+  repositories:
+    - repository: GitHubRepo
+      type: github
+      name: devopscursoai/DevTest
+      endpoint: GitHubConnection
+      ref: main
+
 pool:
   vmImage: 'windows-latest'
 
@@ -10,15 +18,15 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-# Install NuGet
+- checkout: GitHubRepo
+  clean: true
+
 - task: NuGetToolInstaller@1
 
-# Restore packages
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
 
-# Build and publish using MSBuild
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
@@ -26,14 +34,12 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-# Publish build artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(build.artifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
-# Deploy to Azure Web App
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure Web App'
   inputs:
@@ -41,5 +47,6 @@ steps:
     appName: 'tpcsapp'
     resourceGroupName: 'DevopsRG1'
     package: '$(build.artifactStagingDirectory)/**/*.zip'
+
 
 
