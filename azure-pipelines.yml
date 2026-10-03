@@ -37,8 +37,9 @@ steps:
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure Web App'
   inputs:
-    azureSubscription: 'Azure connection'
+    azureSubscription: 'Azure Connection'
     appName: 'tpcsapp'
     resourceGroupName: 'DevopsRG1'
     package: '$(build.artifactStagingDirectory)/**/*.zip'
+
 
